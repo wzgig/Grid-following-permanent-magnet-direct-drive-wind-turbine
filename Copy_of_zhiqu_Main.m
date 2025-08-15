@@ -38,7 +38,7 @@ options = odeset('RelTol',1e-12,'AbsTol',...
     1e-12*ones(1,state_size));
 [t,x] = ode45(@(t,x) Copy_of_zhiqu(t,x),tspan,double(inistate),options);
 
-run("Copy_of_zhiquRef_and_Para.m");
+% run("Copy_of_zhiquRef_and_Para.m");
 
 %%%%%%%%%% states
 

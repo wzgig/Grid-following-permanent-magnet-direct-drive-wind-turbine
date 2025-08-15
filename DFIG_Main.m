@@ -210,3 +210,4 @@ plot(tspan,Qtot/Sbase);
 % plot(tspan,eval(u_rd));
 % 
 % plot(tspan,eval(u_rq));
+plot(tspan,eval(Cp));
