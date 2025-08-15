@@ -35,7 +35,7 @@ v_w = 8;               % 风速 (m/s)
 % T_J = 8;               % 惯性时间常数 (s)
 J = 60;%ac
 D_m = 0.078;%ac           % 自阻尼系数
-R_t = 33.05;
+R_t = 14;
 rho = 1.12;
 
 
@@ -52,7 +52,7 @@ K_p1 = 1;
 K_i1 = 12;
 K_p2 = 1;
 K_i2 = 12;
-K_p3 = 10;
+K_p3 = 100;
 K_i3 = 220;
 % K_p1 = 2129.991/469.486;%u_sd
 % K_i1 = (1/0.05)*2129.991/469.486;%u_sd
@@ -97,6 +97,8 @@ v_b = imag(v_ab);                % β轴电压分量（p.u.，滞后α轴90°电
 % u_sd = 200; u_sq = 320;
 % u_sq = 320;
 % i_sd = 0;
+omega_best = 8.1*v_w/R_t;%最佳叶尖速比
+n_ref = omega_best*30/pi;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
@@ -122,14 +124,12 @@ Tem = Te * (1/(Np*Pnom/(2*pi*Fnom)));
 % P_w = Tm_Nm * omega_m;
 u1 = 0.5*pi;
 u2 = 1.2;
-u3 = 14;%R
-lambda = (u3*omega_m)/(v_w);
+R_t = 14;%R
+lambda = (R_t*omega_m)/(v_w);
 lambda_i = 1/(1/(lambda+0.08*beta)-0.035/(beta^3+1));
 Cp = 0.51763*(116/lambda_i-0.4*beta-5)*exp(-21/lambda_i)+0.006795*lambda;
-P_m = u1*u2*(u3^2)*(v_w^3)*Cp;
+P_m = u1*u2*(R_t^2)*(v_w^3)*Cp;
 T_m = (-1)*(P_m)/omega_m;
-omega_best = 8.1*v_w/u3;%最佳叶尖速比
-n_ref = omega_best*30/pi;
 
 
 % Tem_cmd = ((omega_r^3 * (1/1.1^3))/omega_r) * (-1);

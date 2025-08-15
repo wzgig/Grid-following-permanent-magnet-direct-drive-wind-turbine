@@ -109,3 +109,5 @@ plot(tspan, i_gq, 'DisplayName', 'i_gq');
 hold on;
 plot(tspan, eval(P_dc), 'DisplayName', 'P_dc');
 hold on;
+% 添加图例（会显示DisplayName中设置的内容）
+legend('Location', 'best');  % Location参数指定图例位置，'best'表示自动选择最佳位置

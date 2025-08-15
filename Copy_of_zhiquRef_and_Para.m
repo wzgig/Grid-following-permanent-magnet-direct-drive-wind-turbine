@@ -51,7 +51,7 @@ K_p1 = 1;
 K_i1 = 12;
 K_p2 = 1;
 K_i2 = 12;
-K_p3 = 40;
+K_p3 = 100;
 K_i3 = 220;
 % K_p1 = 2129.991/469.486;%u_sd
 % K_i1 = (1/0.05)*2129.991/469.486;%u_sd
@@ -79,6 +79,7 @@ T_trq = 60;
 % i_sd = 0;
 omega_best = 8.1*v_w/R_t;%最佳叶尖速比
 n_ref = omega_best*30/pi;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 syms omega_m i_sq i_sd x1 x2 y1 u_sd u_sq;
@@ -128,4 +129,3 @@ Q_ref = 0;
 P_s = 1.5*(u_sd * i_sd + u_sq * i_sq);%(2-17)
 Q_s = 1.5*(u_sq * i_sd - u_sd * i_sq);%(2-18)
 P_e = Te * omega_m;
-

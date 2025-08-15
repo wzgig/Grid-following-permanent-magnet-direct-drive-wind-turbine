@@ -66,7 +66,7 @@ K_p1 = 1;
 K_i1 = 12;
 K_p2 = 1;
 K_i2 = 12;
-K_p3 = 40;
+K_p3 = 100;
 K_i3 = 220;
 % K_p1 = 2129.991/469.486;%u_sd
 % K_i1 = (1/0.05)*2129.991/469.486;%u_sd
@@ -92,15 +92,12 @@ T_trq = 60;
 % u_sd = 0;
 % u_sq = 320;
 % i_sd = 0;
-% if t<2
-% v_w =12;
-% end
+
 omega_best = 8.1*v_w/R_t;%最佳叶尖速比
 n_ref = omega_best*30/pi;
-
-if t>2
-v_w = 20;
-end
+% if t>2
+% v_w = 12;
+% end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m i_sq i_sd x1 x2;
