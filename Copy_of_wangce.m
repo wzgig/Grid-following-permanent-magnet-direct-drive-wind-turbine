@@ -53,7 +53,7 @@ L_sq = 1.8e-3;%ac          % q轴电感
 R_s = 0.025;%ac         % 定子电阻
 beta = 0;              % 桨距角，单位：度（固定值
 pitch = 0;
-v_w = 12;               % 风速 (m/s)
+v_w = 8;               % 风速 (m/s)
 % T_J = 8;               % 惯性时间常数 (s)
 J = 60;%ac
 D_m = 0.078;%ac           % 自阻尼系数
@@ -122,9 +122,9 @@ v_b = imag(v_ab);                % β轴电压分量（p.u.，滞后α轴90°电
 % if t<2
 % v_w =12;
 % end
-% if t>2
-% v_w = 14;
-% end
+if t>2
+v_w = 12;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m i_sq i_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_dq z2 z3;
