@@ -16,8 +16,8 @@ eqn9 = v_g_q == 0;
 eqn10 = Kp_PLL*v_g_q+Ki_PLL*PLL_int+w_g == 0;
 eqn11 = (P_s - P_dc)/(C_dc*U_dc) == 0;
 eqn12 = U_dc - U_dcref == 0;
-eqn13 = (v_g_d - u_gd + w_g*L_g*i_gq)/L_g == 0;
-eqn14 = (v_g_q - u_gq - w_g*L_g*i_gd)/L_g == 0;
+eqn13 = (v_g_d - u_gd - R_g*i_gd + w_g*L_g*i_gq)/L_g == 0;
+eqn14 = (v_g_q - u_gq - R_g*i_gq - w_g*L_g*i_gd)/L_g == 0;
 eqn15 = i_gdref - i_gd == 0;
 eqn16 = i_gqref - i_gq == 0;
 
@@ -113,5 +113,11 @@ plot(tspan, i_gq, 'DisplayName', 'i_gq');
 hold on;
 plot(tspan, eval(P_dc), 'DisplayName', 'P_dc');
 hold on;
+% Ptot = sqrt(3)*(eval(u_sq*I_sq) + eval(u_sd*I_sd)) - sqrt(3)*(eval(u_gq)*i_gq + eval(u_gd)*i_gd);
+% Qtot  = sqrt(3)*(eval(u_sq*I_sd) - eval(u_sd*I_sq)) - sqrt(3)*(eval(u_gq)*i_gd - eval(u_gd)*i_gq);
+% plot(tspan,Ptot/Sbase);
+% hold on;
+% plot(tspan,Qtot/Sbase);
+% hold on;
 % 添加图例（会显示DisplayName中设置的内容）
 legend('Location', 'best');  % Location参数指定图例位置，'best'表示自动选择最佳位置

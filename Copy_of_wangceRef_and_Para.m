@@ -125,10 +125,12 @@ v_g_d = vg_dq_real(1);          % 网侧d轴电压
 v_g_q = -vg_dq_real(2);         % 网侧q轴电压
 
 i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
-i_gqref = 0;
+% i_gqref = 0;
+Q_ref = -30000;
+i_gqref = Q_ref/(-1.5*v_g_d);
 
-u_gd = -Kp_Id_grid*(i_gdref - i_gd)-Ki_Id_grid*Id_grid_int+v_g_d+i_gq*w_g*L_g;
-u_gq = -Kp_Iq_grid*(i_gqref - i_gq)-Ki_Iq_grid*Iq_grid_int+v_g_q-i_gd*w_g*L_g;
+u_gd = - Kp_Id_grid*(i_gdref - i_gd) - Ki_Id_grid*Id_grid_int - R_g*i_gd + v_g_d+i_gq*w_g*L_g;
+u_gq = - Kp_Iq_grid*(i_gqref - i_gq) - Ki_Iq_grid*Iq_grid_int - R_g*i_gq + v_g_q-i_gd*w_g*L_g;
 
 P_g = 1.5*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
 P_dc = 1.5*(u_gd* i_gd + u_gq * i_gq);%(2-17)
