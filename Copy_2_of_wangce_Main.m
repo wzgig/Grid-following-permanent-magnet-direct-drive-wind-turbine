@@ -1,7 +1,7 @@
 clear;
 clc;
 
-run("Copy_of_wangceRef_and_Para.m");
+run("Copy_2_of_wangceRef_and_Para.m");
 eqn1 = (Te - T_m - D_m*omega_m) / J == 0;
 eqn2 = u_sq - R_s*i_sq - omega_e*Psi_sd == 0;
 eqn3 = u_sd - R_s*i_sd + omega_e*Psi_sq == 0;
@@ -20,43 +20,33 @@ eqn13 = (v_g_d - u_gd - R_g*i_gd + w_g*L_g*i_gq)/L_g == 0;
 eqn14 = (v_g_q - u_gq - R_g*i_gq - w_g*L_g*i_gd)/L_g == 0;
 eqn15 = i_gdref - i_gd == 0;
 eqn16 = i_gqref - i_gq == 0;
-eqn17 = i_gD - iD == 0;
-eqn18 = i_gQ - iQ == 0;
+
+
 
 disp(eqn1);disp(eqn2);disp(eqn3);disp(eqn4);disp(eqn5);disp(eqn6);disp(eqn7);disp(eqn8);
 disp(eqn9);disp(eqn10);disp(eqn11);disp(eqn12);disp(eqn13);disp(eqn14);disp(eqn15);disp(eqn16);
-disp(eqn17);disp(eqn18);
 
 % syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int u_sd u_sq ...
 %     PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
 [omega_m, Psi_sq, Psi_sd, Id_stator_int, Iq_stator_int, Speed_int,...
-    u_sd, u_sq, PLL_int, thetapll, U_dc, Udc_int, i_gd, i_gq, Id_grid_int, Iq_grid_int,...
-    v_w, i_gqref]...
+    u_sd, u_sq, PLL_int, thetapll, U_dc, Udc_int, i_gd, i_gq, Id_grid_int, Iq_grid_int]...
                       = vpasolve(eval([eqn1,eqn2,eqn3,eqn4,eqn5,eqn6, ...
-                      eqn7,eqn8,eqn9,eqn10,eqn11,eqn12,eqn13,eqn14,eqn15,eqn16, ...
-                      eqn17,eqn18]),...
+                      eqn7,eqn8,eqn9,eqn10,eqn11,eqn12,eqn13,eqn14,eqn15,eqn16]),...
                       [omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int ...
-                      u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int ...
-                      v_w i_gqref],...
+                      u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int],...
                       [0,20;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf; ...
-                      -inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf; ...
-                      -inf,inf;-inf,inf]);
+                      -inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf]);
 
-inistate = [omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int...
-    u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int]'
+inistate = [omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int]'
 state_size = size(inistate,1);
-
-v_w = double(v_w);
-i_gqref = double(i_gqref);
-disp(v_w);disp(i_gqref);
 
 dt = 0.00001;
 tspan=dt:dt:10;
 options = odeset('RelTol',1e-12,'AbsTol',...
     1e-12*ones(1,state_size));
-[t,x] = ode45(@(t,x) Copy_of_wangce(t,x,v_w, i_gqref),tspan,double(inistate),options);
+[t,x] = ode45(@(t,x) Copy_2_of_wangce(t,x),tspan,double(inistate),options);
 
-% run("Copy_of_wangceRef_and_Para.m");
+% run("Copy_2_of_wangceRef_and_Para.m");
 
 %%%%%%%%%% states
 

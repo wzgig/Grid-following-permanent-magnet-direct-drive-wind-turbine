@@ -1,4 +1,4 @@
-function dotx = Copy_of_wangce(t,x,v_w, i_gqref)
+function dotx = Copy_2_of_wangce(t,x)
 %轴系方程+定子电压方程q轴d轴+d轴控制，采用有名值,d轴PI参数没有调好，初始不稳定
 %参考曹明峰
 %%%%%%%%%%%%%%%%%%%%%%%%%% Rename %%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,11 +21,11 @@ Iq_grid_int   = x(16);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%  Paras  %%%%%%%%%%%%%%%%%%%%%%%%
 f    = 50;
-Fnom    = f;
-Np  = 12;
+Fnom    = 50;
+Np  = 48;
 w_g = 2*pi*f;
-Sbase = 2e6;
-Pnom = Sbase;
+Sbase = 1.5e6;
+Pnom = 1.5e6;
 Vbase = 690;
 Vdqbase = Vbase/sqrt(3);
 Ibase = Sbase/(sqrt(3)*Vbase);
@@ -34,11 +34,11 @@ Zbase = Vbase^2/Sbase;
 Lbase = Zbase/w_g;%电感基值
 Cbase = 1/(wbase*Zbase);%电容基值
 Tbase = Sbase/(w_g/Np);
-U_dcref = 1800;
+U_dcref = 1150;
 
-R_g = 0.05;%pu
-L_g = 7e-3;%pu
-C_dc = 1e-3;
+R_g = 0.00066125;%pu
+L_g = 0.0001754;%pu
+C_dc = 10000e-6;
 % Psibase = Vbase/wbase;% 基准磁链
 % tbase = 1;% 时间基值/wbase
 % Kv_p_base = Ibase/Vbase;%电压环比例增益
@@ -47,16 +47,16 @@ C_dc = 1e-3;
 % Ki_i_base = (Vbase/Ibase)/tbase;%电流环积分增益
 % Dbase = Tbase/(wbase * wbase);%自阻尼基准值
 
-Psi_f = 3.88889;%ac           % 转子磁链 
-L_sd = 1.8e-3;%ac          % d轴电感 
-L_sq = 1.8e-3;%ac          % q轴电感 
-R_s = 0.025;%ac         % 定子电阻
+Psi_f = 1.48;%ac           % 转子磁链 
+L_sd = 0.3e-3;%ac          % d轴电感 
+L_sq = 0.3e-3;%ac          % q轴电感 
+R_s = 0.006;%ac         % 定子电阻
 beta = 0;              % 桨距角，单位：度（固定值
 pitch = 0;
-% v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
-J = 60;%ac
-D_m = 0.078;%ac           % 自阻尼系数
-R_t = 14;
+v_w = 12;               % 风速 (m/s)
+J = 35000;%ac
+D_m = 0.01;%ac           % 自阻尼系数
+R_t = 40;
 rho = 1.12;
 
 Kp_Id_stator = 1;
@@ -79,8 +79,8 @@ T_m = 1/3000;
 T_trq = 60;
 
 % 目标有功功率和无功功率（单位：p.u.）
-P = -1;     % 发电模式下为负值，有功功率（p.u.）
-Q = 0;     % 无功功率（p.u.）
+P = -0.8;     % 发电模式下为负值，有功功率（p.u.）
+Q = -0.3;     % 无功功率（p.u.）
 V = 0.9998;   % 母线电压幅值（p.u.）
 xi = 0.6286;  % 电压相角（rad）
 
@@ -92,8 +92,8 @@ i_abs = abs(S_ab0);              % 电流幅值（p.u.）
 ui_argdiff = angle(S_ab0);       % 电压与电流之间的相角差（rad）
 i_arg = xi - ui_argdiff;         % 电流在αβ坐标系中的相位（rad，xi为电网电压α轴相位）
 i_ab = i_abs * exp(1i * i_arg);  % αβ坐标下的复电流（i_ab = i_α + j*i_β）
-iQ = imag(i_ab);                % β轴电流分量（p.u.）
-iD = real(i_ab);                % α轴电流分量（p.u.）
+i_b = imag(i_ab);                % β轴电流分量（p.u.）
+i_a = real(i_ab);                % α轴电流分量（p.u.）
 
 v_ab = V * exp(1i * xi);         % αβ坐标下的复电压（v_ab = v_α + j*v_β，xi为电压α轴相位）
 v_a = real(v_ab);                % α轴电压分量（p.u.，与电网A相电压对齐）
@@ -148,16 +148,10 @@ vg_dq_real = Vbase * Tg_DQdq * [v_a; v_b];  % GSC中的实际电压
 v_g_d = vg_dq_real(1);          % 网侧d轴电压
 v_g_q = -vg_dq_real(2);         % 网侧q轴电压
 
-Tg_dqDQ = [cos(-theta_g) -sin(-theta_g); sin(-theta_g) cos(-theta_g)];
-ig_dq = (1/Ibase)*Tg_dqDQ*[i_gd;i_gq];
-
-i_gD = ig_dq(1);
-i_gQ = ig_dq(2);
-
 i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
 % i_gqref = 0;
-% Q_ref = -30000;
-% i_gqref = Q_ref/(-1.5*v_g_d);
+Q_ref = -30000;
+i_gqref = Q_ref/(-1.5*v_g_d);
 
 u_gd = - Kp_Id_grid*(i_gdref - i_gd) - Ki_Id_grid*Id_grid_int - R_g*i_gd + v_g_d+i_gq*w_g*L_g;
 u_gq = - Kp_Iq_grid*(i_gqref - i_gq) - Ki_Iq_grid*Iq_grid_int - R_g*i_gq + v_g_q-i_gd*w_g*L_g;

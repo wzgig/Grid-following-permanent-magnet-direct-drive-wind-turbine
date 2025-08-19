@@ -1,9 +1,9 @@
 f    = 50;
-Fnom    = 50;
+Fnom    = f;
 Np  = 12;
 w_g = 2*pi*f;
-Sbase = 0.3e6;
-Pnom = 0.3e6;
+Sbase = 2e6;
+Pnom = Sbase;
 Vbase = 690;
 Vdqbase = Vbase/sqrt(3);
 Ibase = Sbase/(sqrt(3)*Vbase);
@@ -31,7 +31,7 @@ L_sq = 1.8e-3;%ac          % q轴电感
 R_s = 0.025;%ac         % 定子电阻
 beta = 0;              % 桨距角，单位：度（固定值
 pitch = 0;
-v_w = 12;               % 风速 (m/s)
+% v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
 J = 60;%ac
 D_m = 0.078;%ac           % 自阻尼系数
 R_t = 14;
@@ -57,8 +57,8 @@ T_m = 1/3000;
 T_trq = 60;
 
 % 目标有功功率和无功功率（单位：p.u.）
-P = -0.8;     % 发电模式下为负值，有功功率（p.u.）
-Q = -0.3;     % 无功功率（p.u.）
+P = -1;     % 发电模式下为负值，有功功率（p.u.）
+Q = -0;     % 无功功率（p.u.）
 V = 0.9998;   % 母线电压幅值（p.u.）
 xi = 0.6286;  % 电压相角（rad）
 
@@ -70,20 +70,22 @@ i_abs = abs(S_ab0);              % 电流幅值（p.u.）
 ui_argdiff = angle(S_ab0);       % 电压与电流之间的相角差（rad）
 i_arg = xi - ui_argdiff;         % 电流在αβ坐标系中的相位（rad，xi为电网电压α轴相位）
 i_ab = i_abs * exp(1i * i_arg);  % αβ坐标下的复电流（i_ab = i_α + j*i_β）
-i_b = imag(i_ab);                % β轴电流分量（p.u.）
-i_a = real(i_ab);                % α轴电流分量（p.u.）
+iQ = imag(i_ab);                % β轴电流分量（p.u.）
+iD = real(i_ab);                % α轴电流分量（p.u.）
 
 v_ab = V * exp(1i * xi);         % αβ坐标下的复电压（v_ab = v_α + j*v_β，xi为电压α轴相位）
 v_a = real(v_ab);                % α轴电压分量（p.u.，与电网A相电压对齐）
 v_b = imag(v_ab);                % β轴电压分量（p.u.，滞后α轴90°电角度）
 %%%%%%%%%%%%%%%%%%%%%%%%%% Ref    %%%%%%%%%%%%%%%%%%%%%%%%
-omega_best = 8.1*v_w/R_t;%最佳叶尖速比
-n_ref = omega_best*30/pi;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m Psi_sq Psi_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_gq z2 z3;
-syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int u_sd u_sq ...
-    PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
+syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int...
+    u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
+syms v_w i_gqref
+omega_best = 8.1*v_w/R_t;%最佳叶尖速比
+n_ref = omega_best*30/pi;
 n = omega_m * 30/pi;
 omega_e = omega_m*Np;
 omega_r = omega_m * (Np/(Fnom*2*pi));
@@ -124,10 +126,16 @@ vg_dq_real = Vbase * Tg_DQdq * [v_a; v_b];  % GSC中的实际电压
 v_g_d = vg_dq_real(1);          % 网侧d轴电压
 v_g_q = -vg_dq_real(2);         % 网侧q轴电压
 
+Tg_dqDQ = [cos(-theta_g) -sin(-theta_g); sin(-theta_g) cos(-theta_g)];
+ig_dq = (1/Ibase)*Tg_dqDQ*[i_gd;i_gq];
+
+i_gD = ig_dq(1);
+i_gQ = ig_dq(2);
+
 i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
 % i_gqref = 0;
-Q_ref = -30000;
-i_gqref = Q_ref/(-1.5*v_g_d);
+% Q_ref = -30000;
+% i_gqref = Q_ref/(-1.5*v_g_d);
 
 u_gd = - Kp_Id_grid*(i_gdref - i_gd) - Ki_Id_grid*Id_grid_int - R_g*i_gd + v_g_d+i_gq*w_g*L_g;
 u_gq = - Kp_Iq_grid*(i_gqref - i_gq) - Ki_Iq_grid*Iq_grid_int - R_g*i_gq + v_g_q-i_gd*w_g*L_g;
