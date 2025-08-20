@@ -20,11 +20,11 @@ Id_grid_int   = x(15);
 Iq_grid_int   = x(16);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%  Paras  %%%%%%%%%%%%%%%%%%%%%%%%
-f    = 50;
+f    = 60;
 Fnom    = f;
-Np  = 12;
+Np  = 48;
 w_g = 2*pi*f;
-Sbase = 2e6;
+Sbase = 1.5e6;
 Pnom = Sbase;
 Vbase = 690;
 Vdqbase = Vbase/sqrt(3);
@@ -34,7 +34,7 @@ Zbase = Vbase^2/Sbase;
 Lbase = Zbase/w_g;%电感基值
 Cbase = 1/(wbase*Zbase);%电容基值
 Tbase = Sbase/(w_g/Np);
-U_dcref = 1800;
+U_dcref = 1150;
 
 R_g = 0.05;%pu
 L_g = 7e-3;%pu
@@ -47,16 +47,28 @@ C_dc = 1e-3;
 % Ki_i_base = (Vbase/Ibase)/tbase;%电流环积分增益
 % Dbase = Tbase/(wbase * wbase);%自阻尼基准值
 
-Psi_f = 3.88889;%ac           % 转子磁链 
-L_sd = 1.8e-3;%ac          % d轴电感 
-L_sq = 1.8e-3;%ac          % q轴电感 
-R_s = 0.025;%ac         % 定子电阻
+% Psi_f = 3.88889;%ac           % 转子磁链 
+% L_sd = 1.8e-3;%ac          % d轴电感 
+% L_sq = 1.8e-3;%ac          % q轴电感 
+% R_s = 0.025;%ac         % 定子电阻
+% beta = 0;              % 桨距角，单位：度（固定值
+% pitch = 0;
+% % v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
+% J = 60;%ac
+% D_m = 0.078;%ac           % 自阻尼系数
+% R_t = 14;
+% rho = 1.12;
+
+Psi_f = 1.48;%ac           % 转子磁链 
+L_sd = 1.5e-3;%ac          % d轴电感 
+L_sq = 1.5e-3;%ac          % q轴电感 
+R_s = 0.006;%ac         % 定子电阻
 beta = 0;              % 桨距角，单位：度（固定值
 pitch = 0;
 % v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
-J = 60;%ac
-D_m = 0.078;%ac           % 自阻尼系数
-R_t = 14;
+J = 35000;%ac
+D_m = 0.01;%ac           % 自阻尼系数
+R_t = 33;
 rho = 1.12;
 
 Kp_Id_stator = 1;
@@ -134,8 +146,8 @@ i_sqref = Kp_Speed*(n_ref - n) + Ki_Speed*Speed_int;
 u_sqref = Kp_Iq_stator*(i_sqref - i_sq)+Ki_Iq_stator*Iq_stator_int+omega_e*Psi_f+omega_e*L_sd*i_sd;
 u_sdref = Kp_Id_stator*(i_sdref - i_sd)+Ki_Id_stator*Id_stator_int-omega_e*L_sq*i_sq;
 
-P_s = 1.5*(u_sd * i_sd + u_sq * i_sq);%(2-17)
-Q_s = 1.5*(u_sq * i_sd - u_sd * i_sq);%(2-18)
+P_s = sqrt(3)*(u_sd * i_sd + u_sq * i_sq);%(2-17)
+Q_s = sqrt(3)*(u_sq * i_sd - u_sd * i_sq);%(2-18)
 P_e = Te * omega_m;
 
 %% ========== 坐标变换（GSC的电压观测） ==========
@@ -162,9 +174,9 @@ i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
 u_gd = - Kp_Id_grid*(i_gdref - i_gd) - Ki_Id_grid*Id_grid_int - R_g*i_gd + v_g_d+i_gq*w_g*L_g;
 u_gq = - Kp_Iq_grid*(i_gqref - i_gq) - Ki_Iq_grid*Iq_grid_int - R_g*i_gq + v_g_q-i_gd*w_g*L_g;
 
-P_g = 1.5*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
-P_dc = 1.5*(u_gd* i_gd + u_gq * i_gq);%(2-17)
-Q_g = 1.5*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)
+P_g = sqrt(3)*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
+P_dc = sqrt(3)*(u_gd* i_gd + u_gq * i_gq);%(2-17)
+Q_g = sqrt(3)*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)
 
 %%%%%%%%%%%%%%%%%%%%%%% Differential %%%%%%%%%%%%%%%%%%%%%
 
