@@ -125,9 +125,9 @@ Vdc_ref = 1200;
 % if t>2
 % Ird_ref = 1313.0844995607461804041666784972;
 % end
-if t> 1
-wind= 20;
-end
+% if t> 1
+% wind= 20;
+% end
 % if t> 1.2
 % wind= 11;
 % end
