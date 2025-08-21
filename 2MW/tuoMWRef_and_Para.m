@@ -5,7 +5,7 @@ w_g = 2*pi*f;
 Sbase = 2e6;
 Pnom = Sbase;
 Vbase = 690;
-Vdqbase = Vbase/sqrt(3);
+% Vbase = Vbase/sqrt(3);
 Ibase = Sbase/(sqrt(3)*Vbase);
 wbase = w_g;
 Zbase = Vbase^2/Sbase;
@@ -40,7 +40,7 @@ C_dc = 1e-3;
 Psi_f = 3.88889;%ac           % 转子磁链 
 L_sd = 1.8e-3;%ac         % d轴电感 
 L_sq = 1.8e-3;%ac         % q轴电感 
-R_s = 0.03;%ac          % 定子电阻
+R_s = 0.0026;%ac          % 定子电阻
 beta = 0;                 % 桨距角，单位：度（固定值
 pitch = beta;
 % v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
@@ -69,8 +69,8 @@ T_m = 1/3000;
 T_trq = 60;
 
 % 目标有功功率和无功功率（单位：p.u.）
-P = -0.3;     % 发电模式下为负值，有功功率（p.u.）
-Q = -0;     % 无功功率（p.u.）
+P = -1;     % 发电模式下为负值，有功功率（p.u.）
+Q = 0;     % 无功功率（p.u.）
 V = 0.9998;   % 母线电压幅值（p.u.）
 xi = 0.6286;  % 电压相角（rad）
 
@@ -98,6 +98,7 @@ syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int...
 syms v_w i_gqref
 omega_best = 8.1*v_w/R_t;%最佳叶尖速比
 n_ref = omega_best*30/pi;
+
 n = omega_m * 30/pi;
 omega_e = omega_m*Np;
 omega_r = omega_m * (Np/(Fnom*2*pi));
@@ -105,7 +106,7 @@ omega_r = omega_m * (Np/(Fnom*2*pi));
 i_sd = (Psi_sd - Psi_f)/L_sd;
 i_sq = Psi_sq/L_sq;
 
-Te = 1.5*Np*(Psi_f*i_sq);
+Te = sqrt(3)*Np*(Psi_f*i_sq);
 Tem = Te * (1/(Np*Pnom/(2*pi*Fnom)));
 
 u1 = 0.5*pi;
@@ -145,13 +146,10 @@ i_gD = ig_dq(1);
 i_gQ = ig_dq(2);
 
 i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
-% i_gqref = 0;
-% Q_ref = -30000;
-% i_gqref = Q_ref/(-1.5*v_g_d);
 
 u_gd = - Kp_Id_grid*(i_gdref - i_gd) - Ki_Id_grid*Id_grid_int - R_g*i_gd + v_g_d+i_gq*w_g*L_g;
 u_gq = - Kp_Iq_grid*(i_gqref - i_gq) - Ki_Iq_grid*Iq_grid_int - R_g*i_gq + v_g_q-i_gd*w_g*L_g;
 
-P_g = sqrt(3)*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
 P_dc = sqrt(3)*(u_gd* i_gd + u_gq * i_gq);%(2-17)
+P_g = sqrt(3)*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
 Q_g = sqrt(3)*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)

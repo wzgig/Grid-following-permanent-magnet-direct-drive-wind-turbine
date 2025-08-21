@@ -1,4 +1,4 @@
-function dotx = tuoMW(t,x,v_w, i_gqref)
+function dotx = Copy_of_tuoMW(t,x,v_w, i_gqref)
 %轴系方程+定子电压方程q轴d轴+d轴控制，采用有名值,d轴PI参数没有调好，初始不稳定
 %参考曹明峰
 %%%%%%%%%%%%%%%%%%%%%%%%%% Rename %%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +27,6 @@ w_g = 2*pi*f;
 Sbase = 1.5e6;
 Pnom = Sbase;
 Vbase = 690;
-% Vbase = Vbase/sqrt(3);%dq轴下电压基值
 Ibase = Sbase/(sqrt(3)*Vbase);
 wbase = w_g;
 Zbase = Vbase^2/Sbase;
@@ -62,7 +61,7 @@ C_dc = 1e-3;
 Psi_f = 3.88889;%ac           % 转子磁链 
 L_sd = 1.8e-3;%ac         % d轴电感 
 L_sq = 1.8e-3;%ac         % q轴电感 
-R_s = 0.0026;%ac          % 定子电阻
+R_s = 0.03;%ac          % 定子电阻
 beta = 0;                 % 桨距角，单位：度（固定值
 pitch = beta;
 % v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
@@ -92,7 +91,7 @@ T_trq = 60;
 
 % 目标有功功率和无功功率（单位：p.u.）
 P = -1;     % 发电模式下为负值，有功功率（p.u.）
-Q = 0;     % 无功功率（p.u.）
+Q = -0;     % 无功功率（p.u.）
 V = 0.9998;   % 母线电压幅值（p.u.）
 xi = 0.6286;  % 电压相角（rad）
 
@@ -119,7 +118,6 @@ n_ref = omega_best*30/pi;
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m i_sq i_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_dq z2 z3;
-
 n = omega_m * 30/pi;
 omega_e = omega_m*Np;
 omega_r = omega_m * (Np/(Fnom*2*pi));
@@ -127,7 +125,7 @@ omega_r = omega_m * (Np/(Fnom*2*pi));
 i_sd = (Psi_sd - Psi_f)/L_sd;
 i_sq = Psi_sq/L_sq;
 
-Te = sqrt(3)*Np*(Psi_f*i_sq);
+Te = 3/2*Np*(Psi_f*i_sq);
 Tem = Te * (1/(Np*Pnom/(2*pi*Fnom)));
 
 u1 = 0.5*pi;
@@ -146,8 +144,8 @@ i_sqref = Kp_Speed*(n_ref - n) + Ki_Speed*Speed_int;
 u_sqref = Kp_Iq_stator*(i_sqref - i_sq)+Ki_Iq_stator*Iq_stator_int+omega_e*Psi_f+omega_e*L_sd*i_sd;
 u_sdref = Kp_Id_stator*(i_sdref - i_sd)+Ki_Id_stator*Id_stator_int-omega_e*L_sq*i_sq;
 
-P_s = sqrt(3)*(u_sd * i_sd + u_sq * i_sq);%(2-17)
-Q_s = sqrt(3)*(u_sq * i_sd - u_sd * i_sq);%(2-18)
+P_s = 1.5*(u_sd * i_sd + u_sq * i_sq);%(2-17)
+Q_s = 1.5*(u_sq * i_sd - u_sd * i_sq);%(2-18)
 P_e = Te * omega_m;
 
 %% ========== 坐标变换（GSC的电压观测） ==========

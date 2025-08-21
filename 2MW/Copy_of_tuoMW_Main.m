@@ -1,7 +1,7 @@
 clear;
 clc;
 
-run("tuoMWRef_and_Para.m");
+run("Copy_of_tuoMWRef_and_Para.m");
 eqn1 = (Te - T_m - D_m*omega_m) / J == 0;
 eqn2 = u_sq - R_s*i_sq - omega_e*Psi_sd == 0;
 eqn3 = u_sd - R_s*i_sd + omega_e*Psi_sq == 0;
@@ -54,7 +54,7 @@ dt = 0.00001;
 tspan=dt:dt:10;
 options = odeset('RelTol',1e-12,'AbsTol',...
     1e-12*ones(1,state_size));
-[t,x] = ode45(@(t,x) tuoMW(t,x,v_w, i_gqref),tspan,double(inistate),options);
+[t,x] = ode45(@(t,x) Copy_of_tuoMW(t,x,v_w, i_gqref),tspan,double(inistate),options);
 
 % run("tuoMWRef_and_Para.m");
 
@@ -130,6 +130,6 @@ legend('Location', 'best', 'Interpreter', 'tex');
 figure(2);
 plot(tspan, eval(P_g/Sbase), 'DisplayName', 'P_g^{pu}');
 hold on;
-plot(tspan, eval(Q_g/Sbase), 'DisplayName', 'P_g^{pu}');
+plot(tspan, eval(Q_g/Sbase), 'DisplayName', 'Q_g^{pu}');
 hold on;
 legend('Location', 'best', 'Interpreter', 'tex');   % Location参数指定图例位置，'best'表示自动选择最佳位置
