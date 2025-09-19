@@ -1,9 +1,9 @@
 function dotx = tuoMW(t,x,v_w, i_gqref)
-%轴系方程+定子电压方程q轴d轴+d轴控制，采用有名值,d轴PI参数没有调好，初始不稳定
+%轴系方程+定子电压方程q轴d轴+d轴控制
 %参考曹明峰
 %%%%%%%%%%%%%%%%%%%%%%%%%% Rename %%%%%%%%%%%%%%%%%%%%%%%%
 omega_m = x(1);
-Psi_sq       = x(2);
+Psi_sq  = x(2);
 Psi_sd       = x(3);
 Id_stator_int         = x(4);
 Iq_stator_int         = x(5);
@@ -84,17 +84,17 @@ Ki_Id_grid = 15;
 Kp_Iq_grid = 1;
 Ki_Iq_grid = 15;
 
-Kp_PLL = 250;
-Ki_PLL = 3200;
-T_d = 1/6000;
+Kp_PLL = 4;
+Ki_PLL = 400;
+T_d = 1/4000;
 T_m = 1/3000;
 T_trq = 60;
 
 % 目标有功功率和无功功率（单位：p.u.）
 P = -1;     % 发电模式下为负值，有功功率（p.u.）
 Q = 0;     % 无功功率（p.u.）
-V = 0.9998;   % 母线电压幅值（p.u.）
-xi = 0.6286;  % 电压相角（rad）
+V = 1;     % 母线电压幅值（p.u.）
+xi = -pi/6;  % 电压相角（rad）
 
 % 计算 a-b 坐标系下的电流参考值
 S_D0 = P/V;                      % 有功功率对应的电流分量基础（p.u.）
@@ -113,9 +113,6 @@ v_b = imag(v_ab);                % β轴电压分量（p.u.，滞后α轴90°电
 %%%%%%%%%%%%%%%%%%%%%%%%%% Ref    %%%%%%%%%%%%%%%%%%%%%%%%
 omega_best = 8.1*v_w/R_t;%最佳叶尖速比
 n_ref = omega_best*30/pi;
-% if t>2
-% v_w = 12;
-% end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m i_sq i_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_dq z2 z3;
