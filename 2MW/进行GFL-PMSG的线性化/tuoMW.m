@@ -36,8 +36,8 @@ Cbase = 1/(wbase*Zbase);%电容基值
 Tbase = Sbase/(w_g/Np);
 U_dcref = 1150;
 
-R_g = 0.05;%pu
-L_g = 7e-3;%pu
+R_g = 0.05;
+L_g = 7e-3;
 C_dc = 1e-3;
 % Psibase = Vbase/wbase;% 基准磁链
 % tbase = 1;% 时间基值/wbase
@@ -94,7 +94,7 @@ T_trq = 60;
 P = -1;     % 发电模式下为负值，有功功率（p.u.）
 Q = 0;     % 无功功率（p.u.）
 V = 1;     % 母线电压幅值（p.u.）
-xi = -pi/6;  % 电压相角（rad）
+xi = pi/6;  % 电压相角（rad）
 
 % 计算 a-b 坐标系下的电流参考值
 S_D0 = P/V;                      % 有功功率对应的电流分量基础（p.u.）

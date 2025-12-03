@@ -1,6 +1,27 @@
 clear;
 clc;
 
+%% ============ 可视化配置 ============
+
+% 总开关：false = 完全不画图
+ENABLE_VOC_PLOT = true;
+
+% 是否只对"选定工况"画图：
+%   false = 只要 ENABLE_VOC_PLOT=true，就对所有工况画图
+%   true  = 只对 PLOT_OPS 列表里的工况画图
+PLOT_SELECTED_ONLY = false;
+
+% 想要画图的工况列表，每一行是 [P, Q, V, xi]
+% 你可以按需要增加 / 删除行
+PLOT_OPS = [
+    0.3   0.5   1.1   -pi/2;   % 例子：P=0.3, Q=0.5, V=1.1, xi=-pi/2
+    % 0.5   0.0   1.0   0.0;   % 再加一个例子（需要的话解注释）
+];
+
+% 数值比较时的容差（工况是浮点数，不建议用严格 ==）
+OP_TOL = 1e-6;
+
+%% ===================================
 
 % Path_root_Results = "your root";
 % 
@@ -29,15 +50,20 @@ end
 
 
 % % 定义参数范围和步长
-P_range = linspace(0.3, 1.2, 5);    % P从-0.3到-1.2，步长0.1
-Q_range = linspace(0.1, 0.5, 5);      % Q从-0.5到+0.5，步长0.1
-V_range = linspace(0.9, 1.1, 5);      % V从0.9到1.1，步长0.05
-xi_range = linspace(-pi/2, pi/2, 20);     % xi从-0.6到0.6，步长0.2
+% P_range = linspace(0.3, 1.2, 5);    % P从-0.3到-1.2，步长0.1
+% Q_range = linspace(0.1, 0.5, 5);      % Q从-0.5到+0.5，步长0.1
+% V_range = linspace(0.9, 1.1, 5);      % V从0.9到1.1，步长0.05
+% xi_range = linspace(-pi/2, pi/2, 20);     % xi从-0.6到0.6，步长0.2
 
-% P_range = 0.3;
+% P_range = 1;
 % Q_range = 0.5;
 % V_range = 1.1;
 % xi_range = -pi/2; 
+
+P_range = 1;
+Q_range = 0.2;
+V_range = 1.1;
+xi_range = -pi/2; 
 
 % P=-0.8;
 % Q=-0.3;
@@ -194,16 +220,38 @@ end
 
 sys = ss(A,B,C,D);
 
-
 eigenvalues = eig(A);
 
-filename = sprintf('P%d_V%d_Q%d_X%d.mat', iP, iV, iQ, ixi);
-path = sprintf('%s%s', Path_root_Results, filename);
-save(path, 'sys');
+%% ========= 可视化（可选 + 可选工况）=========
+do_plot = false;
 
-% % 后续保存文件时，用 fullfile 来拼路径更安全
+if ENABLE_VOC_PLOT
+    if ~PLOT_SELECTED_ONLY
+        % 模式：所有工况都画
+        do_plot = true;
+    else
+        % 模式：只画 PLOT_OPS 列表中配置的工况
+        current_op = [P, Q, V, xi];   % 当前工况
+        diff_mat   = abs(PLOT_OPS - current_op);  % 和列表里每一行比较
+        match_rows = all(diff_mat < OP_TOL, 2);   % 哪些行是"匹配的"
+        if any(match_rows)
+            do_plot = true;
+        end
+    end
+end
+
+if do_plot
+    visualize_voc_linearization(sys, eigenvalues, P, Q, V, xi);
+end
+%% ============================================
+
 % filename = sprintf('P%d_V%d_Q%d_X%d.mat', iP, iV, iQ, ixi);
-% save(fullfile(Path_root_Results, filename), 'sys');
+% path = sprintf('%s%s', Path_root_Results, filename);
+% save(path, 'sys');
+
+% 后续保存文件时，用 fullfile 来拼路径更安全
+filename = sprintf('P%d_V%d_Q%d_X%d.mat', iP, iV, iQ, ixi);
+save(fullfile(Path_root_Results, filename), 'sys');
 
 if any(eigenvalues > 0.01)
 disp([filename, "is not stable."])
