@@ -56,8 +56,8 @@ function visualize_voc_linearization(sys, eigenvalues, P, Q, V, xi)
         % 幅值纵轴范围（dB）：[] 表示自适应
         mag_ylim   = [];         % 例如 [20 80]；留空 [] = 自动
 
-        % 相位纵轴范围（deg）
-        phase_ylim = [-200 200]; % 按需求固定为 -200 ~ 200
+        % 相位纵轴范围（deg）：[] 表示自适应  ✅ 修改1：注释+默认值统一为[]
+        phase_ylim = [];         % 例如 [-200 200]；留空 [] = 自动（原固定值：[-200 200]）
 
         % 频率采样点个数
         Nw = 400;
@@ -66,7 +66,7 @@ function visualize_voc_linearization(sys, eigenvalues, P, Q, V, xi)
         % 1️⃣ 从 MIMO 系统中抽取"电压→电流"的那一条通道：
         %     输入：v_d（第 1 个输入）
         %     输出：i_{gD}（第 1 个输出）
-        G_iD_vd = sys(1, 1);   % i_{gD}(s) / v_d(s)
+        G_iD_vd = sys(2, 2);   % i_{gD}(s) / v_d(s)
 
         % 2️⃣ 阻抗 = 电压 / 电流 = 1 / 导纳
         %     Z_vd(s) = v_d(s) / i_{gD}(s) = 1 / G_iD_vd(s)
@@ -79,6 +79,10 @@ function visualize_voc_linearization(sys, eigenvalues, P, Q, V, xi)
         [mag, phase] = bode(Z_vd, w);   % mag: |Z(jw)|, phase: ∠Z(jw) (deg)
         mag   = squeeze(mag);
         phase = squeeze(phase);
+
+        % 将相位折叠到 [-180, 180] 区间内
+        % phase = mod(phase + 180, 360) - 180;
+
 
         % 4️⃣ 绘图（稍微美化一下）
         figure('Name', ['VOC impedance Bode: ', titleStr], ...
@@ -108,7 +112,10 @@ function visualize_voc_linearization(sys, eigenvalues, P, Q, V, xi)
         semilogx(f_Hz, phase, 'LineWidth', 1.8);
         grid on; box on;
         xlim([f_min_plot, f_max_plot]);    % 横轴范围 10^0 ~ 10^3
-        ylim(phase_ylim);                  % 固定 -200 ~ 200
+        % ✅ 修改2：相位纵轴添加非空判断（和幅值逻辑一致）
+        if ~isempty(phase_ylim)
+            ylim(phase_ylim);              % 仅当设置了值时，才固定相位范围
+        end
         xlabel('Frequency (Hz)', 'FontSize', 12, 'FontName', 'Times New Roman');
         ylabel('Phase (deg)',   'FontSize', 12, 'FontName', 'Times New Roman');
         set(gca, 'FontName', 'Times New Roman', ...
