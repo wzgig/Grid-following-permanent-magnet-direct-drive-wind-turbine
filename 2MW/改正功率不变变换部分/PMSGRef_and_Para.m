@@ -3,9 +3,7 @@ Fnom    = f;
 Np  = 48;
 w_g = 2*pi*f;
 Sbase = 2e6;
-Pnom = Sbase;
 Vbase = 690;
-% Vbase = Vbase/sqrt(3);
 Ibase = Sbase/(sqrt(3)*Vbase);
 wbase = w_g;
 Zbase = Vbase^2/Sbase;
@@ -17,25 +15,7 @@ U_dcref = 1150;
 R_g = 0.05;%pu
 L_g = 7e-3;%pu
 C_dc = 1e-3;
-% Psibase = Vbase/wbase;% 基准磁链
-% tbase = 1;% 时间基值/wbase
-% Kv_p_base = Ibase/Vbase;%电压环比例增益
-% Kv_i_base = (Ibase/Vbase)/tbase;%电压环积分增益
-% Ki_p_base = Vbase/Ibase;%电流环比例增益
-% Ki_i_base = (Vbase/Ibase)/tbase;%电流环积分增益
-% Dbase = Tbase/(wbase * wbase);%自阻尼基准值
 
-% Psi_f = 3.88889;%ac           % 转子磁链 
-% L_sd = 1.8e-3;%ac          % d轴电感 
-% L_sq = 1.8e-3;%ac          % q轴电感 
-% R_s = 0.025;%ac         % 定子电阻
-% beta = 0;              % 桨距角，单位：度（固定值
-% pitch = 0;
-% % v_w = 10.611186933034323618371655280757;               % 风速 (m/s)
-% J = 60;%ac
-% D_m = 0.078;%ac           % 自阻尼系数
-% R_t = 14;
-% rho = 1.12;
 
 Psi_f = 3.88889;%ac           % 转子磁链 
 L_sd = 1.8e-3;%ac         % d轴电感 
@@ -68,43 +48,43 @@ T_d = 1/6000;
 T_m = 1/3000;
 T_trq = 60;
 
-%% ---- 输入参数 ----
-P  = -1;        % 有功功率（标幺值）。发电模式为负值（按你的约定）
-Q  = 0;         % 无功功率（标幺值）
-V  = 0.9998;    % 电压幅值（标幺值）
-xi = 0.1;     % 电压相角（弧度）
-
-%% ---- 电网电压的α-β坐标系表示（功率不变框架下v_alpha、v_beta取值相同；缩放系数体现在p,q方程中） ----
-v_ab    = V * exp(1i*xi);
-v_alpha = real(v_ab);  % 电压α轴分量
-v_beta  = imag(v_ab);  % 电压β轴分量
-
-%% ---- 从p-q方程求解i_alpha、i_beta（等功率 => 不含3/2系数） ----
-% p = v_alpha*i_alpha + v_beta*i_beta
-% q = v_beta*i_alpha  - v_alpha*i_beta
-
-v2 = v_alpha^2 + v_beta^2;   % 等于V²
-
-if v2 < 1e-12
-    error('电压幅值过小：无法计算电流参考值。');
-end
-
-% 逆映射公式（等功率）：
-% [i_alpha; i_beta] = 1/v2 * [ v_alpha  v_beta;
-%                              v_beta  -v_alpha] * [P; Q]
-i_vec   = 1 / v2 * [ v_alpha,  v_beta;
-                     v_beta,  -v_alpha ] * [P; Q];
-
-i_alpha = i_vec(1);
-i_beta  = i_vec(2);
-i_ab    = i_alpha + 1i*i_beta;
+% %% ---- 输入参数 ----
+% P  = -1;        % 有功功率（标幺值）。发电模式为负值（按你的约定）
+% Q  = 0;         % 无功功率（标幺值）
+% V  = 0.9998;    % 电压幅值（标幺值）
+% xi = 0.09;     % 电压相角（弧度）
+% 
+% %% ---- 电网电压的α-β坐标系表示（功率不变框架下v_alpha、v_beta取值相同；缩放系数体现在p,q方程中） ----
+% v_ab    = V * exp(1i*xi);
+% v_alpha = real(v_ab);  % 电压α轴分量
+% v_beta  = imag(v_ab);  % 电压β轴分量
+% 
+% %% ---- 从p-q方程求解i_alpha、i_beta（等功率 => 不含3/2系数） ----
+% % p = v_alpha*i_alpha + v_beta*i_beta
+% % q = v_beta*i_alpha  - v_alpha*i_beta
+% 
+% v2 = v_alpha^2 + v_beta^2;   % 等于V²
+% 
+% if v2 < 1e-12
+%     error('电压幅值过小：无法计算电流参考值。');
+% end
+% 
+% % 逆映射公式（等功率）：
+% % [i_alpha; i_beta] = 1/v2 * [ v_alpha  v_beta;
+% %                              v_beta  -v_alpha] * [P; Q]
+% i_vec   = 1 / v2 * [ v_alpha,  v_beta;
+%                      v_beta,  -v_alpha ] * [P; Q];
+% 
+% i_alpha = i_vec(1);
+% i_beta  = i_vec(2);
+% i_ab    = i_alpha + 1i*i_beta;
 %%%%%%%%%%%%%%%%%%%%%%%%%% Ref    %%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m Psi_sq Psi_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_gq z2 z3;
 syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int...
-    u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
+    u_sd u_sq U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
 syms v_w i_gqref
 omega_best = 8.1*v_w/R_t;%最佳叶尖速比
 n_ref = omega_best*30/pi;
@@ -117,7 +97,6 @@ i_sd = (Psi_sd - Psi_f)/L_sd;
 i_sq = Psi_sq/L_sq;
 
 Te = Np*(Psi_f*i_sq);
-Tem = Te * (1/(Np*Pnom/(2*pi*Fnom)));
 
 u1 = 0.5*pi;
 u2 = 1.225;
@@ -139,21 +118,7 @@ P_s = (u_sd * i_sd + u_sq * i_sq);%(2-17)
 Q_s = (u_sq * i_sd - u_sd * i_sq);%(2-18)
 P_e = Te * omega_m;
 
-%% ========== 坐标变换（GSC的电压观测） ==========
-% PLL
-theta_g = thetapll;         % 网侧PLL估计的同步角
-% 构造变换矩阵，将d-q轴量转换为定轴坐标系（用于测量或控制）
-Tg_alphabeta_dq = [cos(theta_g) sin(theta_g); -sin(theta_g) cos(theta_g)];
-vg_dq_real = Vbase * Tg_alphabeta_dq * [v_alpha; v_beta];  % GSC中的实际电压
-% 变换后各轴上的电压值提取
-v_g_d = vg_dq_real(1);          % 网侧d轴电压
-v_g_q = -vg_dq_real(2);         % 网侧q轴电压
 
-Tg_dq_alphabeta = [cos(theta_g) -sin(theta_g); sin(theta_g) cos(theta_g)];
-ig_dig_alphabeta = (1/Ibase)*Tg_dq_alphabeta*[i_gd;i_gq];
-
-i_galpha = ig_dig_alphabeta(1);
-i_gbeta = ig_dig_alphabeta(2);
 
 i_gdref = Kp_Udc*(U_dc - U_dcref) + Ki_Udc*Udc_int;
 

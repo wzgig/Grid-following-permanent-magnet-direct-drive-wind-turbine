@@ -178,7 +178,7 @@ theta_pllg= x(:,20);
 % 
 plot(tspan,eval(T_e)/Tbase);
 hold on
-
+figure
 Ptot = sqrt(3)*(eval(u_sq*I_sq) + eval(u_sd*I_sd)) - sqrt(3)*(eval(u_gq)*i_gq + eval(u_gd)*i_gd);
 Qtot  = sqrt(3)*(eval(u_sq*I_sd) - eval(u_sd*I_sq)) - sqrt(3)*(eval(u_gq)*i_gd - eval(u_gd)*i_gq);
 plot(tspan,Ptot/Sbase);

@@ -1,77 +1,7 @@
 clear;
 clc;
 
-f    = 50;
-Fnom    = f;
-Np  = 48;
-w_g = 2*pi*f;
-Sbase = 2e6;
-Vbase = 690;
-Ibase = Sbase/(sqrt(3)*Vbase);
-wbase = w_g;
-Zbase = Vbase^2/Sbase;
-Lbase = Zbase/w_g;%电感基值
-Cbase = 1/(wbase*Zbase);%电容基值
-Tbase = Sbase/(w_g/Np);
-U_dcref = 1150;
-Kp_PLL = 250;
-Ki_PLL = 3200;
-ugq_ref = 0;
-%% ---- 输入参数 ----
-P  = -1;        % 有功功率（标幺值）。发电模式为负值（按你的约定）
-Q  = 0;         % 无功功率（标幺值）
-V  = 0.9998;    % 电压幅值（标幺值）
-xi = 0.09;     % 电压相角（弧度）
-
-%% ---- 电网电压的α-β坐标系表示（功率不变框架下v_alpha、v_beta取值相同；缩放系数体现在p,q方程中） ----
-v_ab    = V * exp(1i*xi);
-v_alpha = real(v_ab);  % 电压α轴分量
-v_beta  = imag(v_ab);  % 电压β轴分量
-
-%% ---- 从p-q方程求解i_alpha、i_beta（等功率 => 不含3/2系数） ----
-% p = v_alpha*i_alpha + v_beta*i_beta
-% q = v_beta*i_alpha  - v_alpha*i_beta
-
-v2 = v_alpha^2 + v_beta^2;   % 等于V²
-
-if v2 < 1e-12
-    error('电压幅值过小：无法计算电流参考值。');
-end
-
-% 逆映射公式（等功率）：
-% [i_alpha; i_beta] = 1/v2 * [ v_alpha  v_beta;
-%                              v_beta  -v_alpha] * [P; Q]
-i_vec   = 1 / v2 * [ v_alpha,  v_beta;
-                     v_beta,  -v_alpha ] * [P; Q];
-
-i_alpha = i_vec(1);
-i_beta  = i_vec(2);
-i_ab    = i_alpha + 1i*i_beta;
-
-syms PLL_int thetapll
-%% ========== 坐标变换（GSC的电压观测） ==========
-% PLL
-theta_g = thetapll;         % 网侧PLL估计的同步角
-% 构造变换矩阵，将d-q轴量转换为定轴坐标系（用于测量或控制）
-Tg_alphabeta_dq = [cos(theta_g) sin(theta_g); -sin(theta_g) cos(theta_g)];
-vg_dq_real = Vbase * Tg_alphabeta_dq * [v_alpha; v_beta];  % GSC中的实际电压
-% 变换后各轴上的电压值提取
-v_g_d = vg_dq_real(1);          % 网侧d轴电压
-v_g_q = -vg_dq_real(2);         % 网侧q轴电压
-
-%% ========== xi求解 ==========
-eqnq = Ki_PLL*(v_g_q/Vbase - ugq_ref) == 0;          % state16
-[pllg] = solve(eval([eqnq]),[thetapll]);
-thetapll = vpa(pllg(2));
-PLL_int = 0;
-%% ---- 主程序 ----
 run("PMSGRef_and_Para.m");
-Tg_dq_alphabeta = [cos(theta_g) -sin(theta_g); sin(theta_g) cos(theta_g)];
-ig_dig_alphabeta = (1/Ibase)*Tg_dq_alphabeta*[i_gd;i_gq];
-
-i_galpha = ig_dig_alphabeta(1);
-i_gbeta = ig_dig_alphabeta(2);
-
 eqn1 = (Te - T_m - D_m*omega_m) / J == 0;
 eqn2 = u_sq - R_s*i_sq - omega_e*Psi_sd == 0;
 eqn3 = u_sd - R_s*i_sd + omega_e*Psi_sq == 0;
@@ -82,6 +12,8 @@ eqn5 = i_sqref - i_sq == 0;
 eqn6 = n_ref - n == 0;
 eqn7 = (u_sdref - u_sd)/T_d == 0;
 eqn8 = (u_sqref - u_sq)/T_d == 0;
+eqn9 = v_g_q == 0;
+eqn10 = Kp_PLL*v_g_q+Ki_PLL*PLL_int+w_g == 0;
 eqn11 = (P_s - P_dc)/(C_dc*U_dc) == 0;
 eqn12 = U_dc - U_dcref == 0;
 eqn13 = (v_g_d - u_gd - R_g*i_gd + w_g*L_g*i_gq)/L_g == 0;
@@ -91,17 +23,23 @@ eqn16 = i_gqref - i_gq == 0;
 eqn17 = i_galpha - i_alpha == 0;
 eqn18 = i_gbeta - i_beta == 0;
 
+% disp(eqn1);disp(eqn2);disp(eqn3);disp(eqn4);disp(eqn5);disp(eqn6);disp(eqn7);disp(eqn8);
+% disp(eqn9);disp(eqn10);disp(eqn11);disp(eqn12);disp(eqn13);disp(eqn14);disp(eqn15);disp(eqn16);
+% disp(eqn17);disp(eqn18);
+
+% syms omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int u_sd u_sq ...
+%     PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int;
 [omega_m, Psi_sq, Psi_sd, Id_stator_int, Iq_stator_int, Speed_int,...
-    u_sd, u_sq, U_dc, Udc_int, i_gd, i_gq, Id_grid_int, Iq_grid_int,...
+    u_sd, u_sq, PLL_int, thetapll, U_dc, Udc_int, i_gd, i_gq, Id_grid_int, Iq_grid_int,...
     v_w, i_gqref]...
                       = vpasolve(eval([eqn1,eqn2,eqn3,eqn4,eqn5,eqn6, ...
-                      eqn7,eqn8,eqn11,eqn12,eqn13,eqn14,eqn15,eqn16, ...
+                      eqn7,eqn8,eqn9,eqn10,eqn11,eqn12,eqn13,eqn14,eqn15,eqn16, ...
                       eqn17,eqn18]),...
                       [omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int ...
-                      u_sd u_sq U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int ...
+                      u_sd u_sq PLL_int thetapll U_dc Udc_int i_gd i_gq Id_grid_int Iq_grid_int ...
                       v_w i_gqref],...
                       [-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf; ...
-                      -inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf; ...
+                      -inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf;-inf,inf; ...
                       -inf,inf;-inf,inf]);
 
 inistate = [omega_m Psi_sq Psi_sd Id_stator_int Iq_stator_int Speed_int...
@@ -138,8 +76,6 @@ i_gd = x(:,13);
 i_gq = x(:,14);
 Id_grid_int = x(:,15);   % 原z2：网侧d轴电流环积分状态
 Iq_grid_int = x(:,16);   % 原z3：网侧q轴电流环积分状态
-
-disp(thetapll(1));
 
 % plot(tspan, eval(i_sd), 'DisplayName', 'i_sd');
 % hold on;
