@@ -122,9 +122,9 @@ v_b = imag(v_ab);                % β轴电压分量（p.u.，滞后α轴90°电
 % if t<2
 % v_w =12;
 % end
-if t>2
-v_w = 14;
-end
+% if t>2
+% v_w = 14;
+% end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Algebra %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% algebra
 % syms omega_m i_sq i_sd x1 x2 y1 u_sd u_sq xpll thetapll U_dc z1 i_gd i_dq z2 z3;
@@ -193,6 +193,7 @@ u_gd = K_p5i_gd*(i_gdref - i_gd)+K_i5i_gd*z2+v_g_d-i_gq*w_g*L_g;
 u_gq = K_p6i_gq*(i_gqref - i_gq)+K_i6i_gq*z3+v_g_q+i_gd*w_g*L_g;
 
 P_g = 1.5*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
+P_dc = 1.5*(u_gd* i_gd + u_gq * i_gq);%(2-17)
 Q_g = 1.5*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)
 
 %%%%%%%%%%%%%%%%%%%%%%% Differential %%%%%%%%%%%%%%%%%%%%%
@@ -210,7 +211,7 @@ Q_g = 1.5*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)
         (u_sqref - u_sq)/T_d;
         v_g_q;
         K_pPLL*v_g_q+K_iPLL*xpll+w_g;
-        (P_s - P_g)/(C_dc*U_dc);
+        (P_s - P_dc)/(C_dc*U_dc);
         U_dc - U_dcref;
         (u_gd - v_g_d + w_g*L_g*i_gq)/L_g;
         (u_gq - v_g_q - w_g*L_g*i_gd)/L_g;

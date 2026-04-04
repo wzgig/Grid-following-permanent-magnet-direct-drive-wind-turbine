@@ -171,4 +171,5 @@ u_gd = K_p5i_gd*(i_gdref - i_gd)+K_i5i_gd*z2+v_g_d-i_gq*w_g*L_g;
 u_gq = K_p6i_gq*(i_gqref - i_gq)+K_i6i_gq*z3+v_g_q+i_gd*w_g*L_g;
 
 P_g = 1.5*(v_g_d * i_gd + v_g_q * i_gq);%(2-17)
+P_dc = 1.5*(u_gd* i_gd + u_gq * i_gq);%(2-17)
 Q_g = 1.5*(v_g_q * i_gd - v_g_d * i_gq);%(2-18)
